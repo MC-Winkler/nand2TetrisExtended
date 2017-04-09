@@ -1,0 +1,34 @@
+// File name: projects/05/a/QC.hdl
+// Author: Michael Winkler
+/**
+ * A 16-bit counter with a count bit.
+ * If the count input bit is 1, then the counter will count;
+ * if the count input bit is 0, then it won't.
+ * For now, I've hardwired the quantum at 64 clock cycles, 
+ * though I may change that in the future.
+ * The out bit represents whether a cycle has been completed.
+ */
+
+CHIP QC {
+    IN count;
+    OUT out;
+
+    PARTS:
+	//The register that holds the QC's actual value
+	Register(in=ResOut,load=true,out[5]=out,out[5]=reset,out=RegOut);
+	
+	//Calculate the QC's previous value + 1
+	Inc16(in=RegOut,out=RegInc);
+
+	Bit(in=count, load=true, out=started);
+	
+	And16(a[0]=started, a[1]=started, a[2]=started, a[3]=started,
+	a[4]=started, a[5]=started, a[6]=started, a[7]=started,
+	a[8]=started, a[9]=started, a[10]=started, a[11]=started,
+	a[12]=started, a[13]=started, a[14]=started, a[15]=started,
+	b=RegInc, out=andOut);
+	
+	//Determine whether to reset
+	Mux16(a=andOut,b=false,sel=reset,out=ResOut);
+	
+}

@@ -68,8 +68,23 @@ CHIP CPU {
     Or(a=jlt, b=Load1, out=Load2);
     And(a=Load2, b=instruction[15], out=Load3);
 
-    PC(in=AVal, load=Load3, inc=true, reset=reset, out[0..14]=pc);
+    PC(in=AVal, load=qcOrLoad3, inc=notQCOut, reset=reset, out=pcOut);
 	
 	And(a=instruction[15], b=instruction[3], out=writeM);
 
+	QC(count=true, out=qcOut);
+	
+	Bit(in=qcOut,out=qcOutDelayed);
+	
+	Or(a=Load3, b=qcOutDelayed, out=qcOrLoad3);
+	
+	Not(in=qcOut, out=notQCOut);
+	
+	Register(in[0]=false, in[1]=false, in[2]=false, in[3]=false,
+		in[4]=true, in[5]=false, in[6]=false, in[7]=false,
+		in[8]=false, in[9]=false, in[10]=false, in[11]=false,
+		in[12]=false, in[13]=false, in[14]=false, in[15]=false,
+		load = true, out = controlRegister);
+		
+	Mux16(a=pcOut, b=controlRegister, sel=qcOut, out[0..14]=pc);
 }
