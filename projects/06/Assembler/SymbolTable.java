@@ -32,6 +32,11 @@ public class SymbolTable {
 		symbolTable.put("R13", 13);
 		symbolTable.put("R14", 14);
 		symbolTable.put("R15", 15);
+		symbolTable.put("CONT", 16);
+		symbolTable.put("R17", 17);
+		symbolTable.put("R18", 18);
+		symbolTable.put("R19", 19);
+		symbolTable.put("R20", 20);
 		symbolTable.put("SCREEN", 16384);
 		symbolTable.put("KBD", 24576);
 	}

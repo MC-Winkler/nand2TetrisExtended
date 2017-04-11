@@ -27,7 +27,7 @@ public class Main {
 		SymbolTable symbolTable = new SymbolTable();
 		
 		int nextAvailableROMAddress = 0;
-		int nextAvailableRAMAddress = 16;
+		int nextAvailableRAMAddress = 21;
 		
 		
 		
