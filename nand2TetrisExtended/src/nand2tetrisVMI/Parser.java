@@ -2,18 +2,18 @@ package nand2tetrisVMI;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Hashtable;
+import java.util.HashMap;
 import java.util.Scanner;
 
 public class Parser {
 
-	private Hashtable<String, Integer> commandTypes;
 	Scanner scanner;
 	String[] currentCommand;
-
+	HashMap<String, Integer> commandTypes;
+	
 	public Parser(File inputFile) {
-		Hashtable<String, Integer> commandTypes = new Hashtable<String, Integer>();
 		
+		commandTypes = new HashMap<String, Integer>();
 		commandTypes.put("add", 0);
 		commandTypes.put("sub", 0);
 		commandTypes.put("neg", 0);
@@ -63,14 +63,14 @@ public class Parser {
 		return false;
 
 	}
-	
+
 	protected int commandType() {
-		return commandTypes.get(currentCommand);
+		return commandTypes.get(currentCommand[0]);
 	}
 
 	protected String arg1() {
-		//0 and 7 correspond to arithmetic operations and returns
-		if (commandTypes.get(currentCommand) == 0 || commandTypes.get(currentCommand) == 7) {
+		//0 and 7 correspond to arithmetic and return command types
+		if (commandType() == 0 || commandType() == 7) {
 			return currentCommand[0].trim();
 		} else {
 			return currentCommand[1].trim();

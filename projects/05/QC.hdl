@@ -15,7 +15,7 @@ CHIP QC {
 
     PARTS:
 	//The register that holds the QC's actual value
-	Register(in=ResOut,load=true,out[5]=out,out[5]=reset,out=RegOut);
+	Register(in=ResOut,load=true,out[7]=out,out[7]=reset,out=RegOut);
 	
 	//Calculate the QC's previous value + 1
 	Inc16(in=RegOut,out=RegInc);

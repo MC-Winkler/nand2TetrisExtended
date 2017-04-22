@@ -70,26 +70,22 @@ CHIP CPU {
 
 	And(a=instruction[15], b=instruction[3], out=writeMPre);
 	
-    PC(in=AVal, load=qcOrLoad3, inc=notQCOut, reset=reset, out=pcOut);
+    PC(in=AValOrControl, load=qcOrLoad3, inc=notQCOut, reset=reset, out=pcOut, out[0..14]=pc);
 	
 	//Modifications for extended CPU below this line
-	Add16(a=pcOut, b[0]=true, b[1]=true, b[2]=true, b[3..15]=false,out=pcTranslated);
 
 	QC(count=true, out=qcOut);
-	
-	Bit(in=qcOut,out=qcOutDelayed);
-	
+		
 	Or(a=loadD, b=qcOut, out=qcOrLoadD);
-	Or(a=Load3, b=qcOutDelayed, out=qcOrLoad3);
+	Or(a=Load3, b=qcOut, out=qcOrLoad3);
 	
 	Not(in=qcOut, out=notQCOut);
-	
-	Register(in[0..3]=false, in[4]=true, in[5..15]=false,
-		load = true, out=controlRegister);
 		
-	Mux16(a=pcTranslated, b=controlRegister, sel=qcOut, out[0..14]=pc);
+	Register (in[0]=false, in[1]=true, in[2..15]=false, load=true, out=controlCode);	
+		
+	Mux16(a=AVal, b=controlCode, sel=qcOut, out=AValOrControl);
 	
-	Mux16(a=ALUout, b=pcTranslated, sel=qcOut, out=ALUOrPC);
+	Mux16(a=ALUout, b=pcOut, sel=qcOut, out=ALUOrPC);
 	
 	Mux(a=writeMPre, b=false, sel=qcOut, out=writeM);
 	

@@ -232,6 +232,26 @@ public class CodeWriter {
 
 	protected void writeInit() {
 		try {
+			
+			//Since the PC starts at 0 but we only want to execute lines 2-4 in the 
+			//case of an interupt, we jump to line 6 by default
+			writer.write("@6\n");
+			writer.write("0;JMP\n");
+			
+			//These three lines get called as part of the interrupt sequence '
+			//when the processor's quantum is reached and control is transferred
+			//from the currently executing process to the OS process sys.control
+			writer.write("M=D\n");
+			writer.write("@16\n");
+			writer.write("0;JMP\n");
+			
+			//initialize control function pointer
+			writer.write("REPLACE ME");
+			writer.write("D=A\n");
+			writer.write("@16\n");
+			writer.write("M=D\n");
+			
+			//initialize stack pointer
 			writer.write("@256\n");
 			writer.write("D=A\n");
 			writer.write("@SP\n");
