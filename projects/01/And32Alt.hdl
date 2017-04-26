@@ -1,0 +1,19 @@
+// This file is part of www.nand2tetris.org
+// and the book "The Elements of Computing Systems"
+// by Nisan and Schocken, MIT Press.
+// File name: projects/01/And16.hdl
+
+/**
+ * 32-bit bitwise And:
+ * for i = 0..31: out[i] = (a[i] and b[i])
+ */
+
+CHIP And32Alt {
+    IN a[32], b[32];
+    OUT out[32];
+
+    PARTS:
+    // Put your code here:
+	And16(a=a[0..15],b=b[0..15],out=out[0..15]);
+	And16(a=a[16..31],b=b[16..31],out=out[16..31]);
+}

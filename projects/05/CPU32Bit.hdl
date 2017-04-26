@@ -1,0 +1,116 @@
+// This file is part of www.nand2tetris.org
+// and the book "The Elements of Computing Systems"
+// by Nisan and Schocken, MIT Press.
+// File name: projects/05/CPU.hdl
+
+/**
+ * The Hack CPU (Central Processing unit), consisting of an ALU,
+ * two registers named A and D, and a program counter named PC.
+ * The CPU is designed to fetch and execute instructions written in 
+ * the Hack machine language. In particular, functions as follows:
+ * Executes the inputted instruction according to the Hack machine 
+ * language specification. The D and A in the language specification
+ * refer to CPU-resident registers, while M refers to the external
+ * memory location addressed by A, i.e. to Memory[A]. The inM input 
+ * holds the value of this location. If the current instruction needs 
+ * to write a value to M, the value is placed in outM, the address 
+ * of the target location is placed in the addressM output, and the 
+ * writeM control bit is asserted. (When writeM==0, any value may 
+ * appear in outM). The outM and writeM outputs are combinational: 
+ * they are affected instantaneously by the execution of the current 
+ * instruction. The addressM and pc outputs are clocked: although they 
+ * are affected by the execution of the current instruction, they commit 
+ * to their new values only in the next time step. If reset==1 then the 
+ * CPU jumps to address 0 (i.e. pc is set to 0 in next time step) rather 
+ * than to the address resulting from executing the current instruction. 
+ */
+
+CHIP CPU32Bit {
+
+    IN  inM[32],         // M value input  (M = contents of RAM[A])
+	    inE[32],		 // E value input  (E = contents of disk[A])
+        instruction[16], // Instruction for execution
+        reset;           // Signals whether to re-start the current
+                         // program (reset==1) or continue executing
+                         // the current program (reset==0).
+
+    OUT outEM[32],       // M or E value output
+        writeM,          // Write to M? 
+        addressM[15],    // Address in data memory (of M)
+		writeE,			 // Write to E?
+		addressE[21],    // Address in disk memory (of E)
+        pc[15];          // address of next instruction
+
+    PARTS:
+	
+	Mux32(a=instruction, b=ALUout, sel=instruction[15], out=newA);
+	
+	//16th bit encodes whether the instruction is an a-instruction or a 
+	//c-instruction. If instruction[15] is 0, we have an a-instruction
+	//which means we want the a register to load a new value
+	Not(in=instruction[15], out=loadA1);
+	
+	//If instruction[5] and instruction[15] are set, we have 
+	//a c-instruction the result of which should be stored in the A register
+	And(a=instruction[5], b=instruction[15], out=loadA2);
+	
+	Or(a=loadA1, b=loadA2, out=loadA);
+	
+	//A register
+	Register32Bit(in=newA, out=AVal, out[0..14]=addressM, out[0..20]=addressE load=loadA);
+    
+	//instruction[14] is the a bit which determines whether the value
+	//in the A register should be fed into the ALU or the value from 
+	//RAM memory
+	Mux32(a=AVal, b=inM, sel=instruction[14], out=AM);
+	
+	//instruction[13] is the a bit which determines whether the value
+	//in the A register should be fed into the ALU or the value from 
+	//disk
+	Mux32(a=AM, b=inE, sel=instruction[13], out=AEM);
+	
+	//if instruction[4] and instruction[15] are set, we have a c-instruction
+	//the result of which should be stored in the d register
+	And(a=instruction[4], b=instruction[15], out=loadD);
+	
+	//D register
+	Register32Bit(in=ALUOrPC, out=DVal, load=qcOrLoadD);
+	
+	ALU(x=DVal, y=AEM, zx=instruction[11], nx=instruction[10], zy=instruction[9], ny=instruction[8],
+		f=instruction[7], no=instruction[6], zr=zr, ng=ng, out=outEM, out=ALUout);
+
+	Not(in=zr, out=neq);
+    Not(in=ng, out=gt);
+    
+    And(a=neq, b=gt, out=ALUOutgt0);
+    And(a=instruction[0], b=ALUOutgt0, out=jgt);
+    
+    And(a=zr, b=instruction[1], out=jeq);
+    Or(a=jeq, b=jgt, out=Load1);
+
+    And(a=ng, b=instruction[2], out=jlt);
+    Or(a=jlt, b=Load1, out=Load2);
+    And(a=Load2, b=instruction[15], out=Load3);
+
+	And(a=instruction[15], b=instruction[3], out=writeMPre);
+	
+    PC32Bit(in=AValOrControl, load=qcOrLoad3, inc=notQCOut, reset=reset, out=pcOut, out[0..14]=pc);
+	
+	//Modifications for extended CPU below this line
+
+	QC32Bit(count=true, out=qcOut);
+		
+	Or(a=loadD, b=qcOut, out=qcOrLoadD);
+	Or(a=Load3, b=qcOut, out=qcOrLoad3);
+	
+	Not(in=qcOut, out=notQCOut);
+		
+	Register32Bit (in[0]=false, in[1]=true, in[2..31]=false, load=true, out=controlCode);	
+		
+	Mux32(a=AVal, b=controlCode, sel=qcOut, out=AValOrControl);
+	
+	Mux32(a=ALUout, b=pcOut, sel=qcOut, out=ALUOrPC);
+	
+	Mux(a=writeMPre, b=false, sel=qcOut, out=writeM);
+	
+}

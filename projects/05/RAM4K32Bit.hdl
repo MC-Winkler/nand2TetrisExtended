@@ -1,0 +1,30 @@
+// This file is part of www.nand2tetris.org
+// and the book "The Elements of Computing Systems"
+// by Nisan and Schocken, MIT Press.
+// File name: projects/03/b/RAM4K_32.hdl
+
+/**
+ * Memory of 4K registers, each 32 bit-wide. Out holds the value
+ * stored at the memory location specified by address. If load==1, then 
+ * the in value is loaded into the memory location specified by address 
+ * (the loaded value will be emitted to out from the next time step onward).
+ */
+
+CHIP RAM4K32Bit {
+    IN in[32], load, address[12];
+    OUT out[32];
+
+    PARTS:
+    DMux8Way(in=load, sel=address[0..2], a=R0L, b=R1L, c=R2L, d=R3L, e=R4L, f=R5L, g=R6L, h=R7L);
+	
+     RAM51232Bit(in=in,load=R0L,address=address[3..11],out=R0);
+     RAM51232Bit(in=in,load=R1L,address=address[3..11],out=R1);
+     RAM51232Bit(in=in,load=R2L,address=address[3..11],out=R2);
+     RAM51232Bit(in=in,load=R3L,address=address[3..11],out=R3);
+     RAM51232Bit(in=in,load=R4L,address=address[3..11],out=R4);
+     RAM51232Bit(in=in,load=R5L,address=address[3..11],out=R5);
+     RAM51232Bit(in=in,load=R6L,address=address[3..11],out=R6);
+     RAM51232Bit(in=in,load=R7L,address=address[3..11],out=R7);
+	
+	Mux8Way32(a=R0,b=R1,c=R2,d=R3,e=R4,f=R5,g=R6,h=R7,sel=address[0..2],out=out);
+}

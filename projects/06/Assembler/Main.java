@@ -54,7 +54,7 @@ public class Main {
 				if (!parser.currentLineIsComment() && parser.commandType()!="L_COMMAND") {
 
 					if (parser.commandType().equals("C_COMMAND")) {
-						lineTranslated = "111" + Code.comp(parser.comp()) + Code.dest(parser.dest())
+						lineTranslated = "1" + Code.comp(parser.comp()) + Code.dest(parser.dest())
 								+ Code.jump(parser.jump());
 					} else if (parser.commandType().equals("A_COMMAND")) {
 						// If the current symbol has anything other than digits, we know that we need 

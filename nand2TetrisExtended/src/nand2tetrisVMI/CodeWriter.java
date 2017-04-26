@@ -229,7 +229,7 @@ public class CodeWriter {
 
 	}
 
-	protected void writeInit() {
+	protected void writeInit(int numPrograms) {
 		try {
 			writer.write("@52\n");
 			writer.write("0;JMP\n");
@@ -251,6 +251,11 @@ public class CodeWriter {
 			 */
 			
 			writeControlCall();
+			
+			writer.write("@" + numPrograms + "\n");
+			writer.write("D=A\n");
+			writer.write("@R17");
+			writer.write("M=D");
 			
 			writer.write("@256\n");
 			writer.write("D=A\n");

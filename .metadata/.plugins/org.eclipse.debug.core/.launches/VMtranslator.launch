@@ -7,6 +7,6 @@
 <listEntry value="1"/>
 </listAttribute>
 <stringAttribute key="org.eclipse.jdt.launching.MAIN_TYPE" value="nand2tetrisVMI.VMtranslator"/>
-<stringAttribute key="org.eclipse.jdt.launching.PROGRAM_ARGUMENTS" value="SysTest"/>
+<stringAttribute key="org.eclipse.jdt.launching.PROGRAM_ARGUMENTS" value="AllTests"/>
 <stringAttribute key="org.eclipse.jdt.launching.PROJECT_ATTR" value="nand2TetrisExtended"/>
 </launchConfiguration>

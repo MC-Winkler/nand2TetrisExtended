@@ -1,0 +1,38 @@
+// File name: projects/05/a/QC_32.hdl
+// Author: Michael Winkler
+/**
+ * A 32-bit quantum counter with a count bit.
+ * If the count input bit is 1, then the counter will count;
+ * if the count input bit is 0, then it won't.
+ * For now, I've hardwired the quantum at 256 clock cycles, 
+ * though I may change that in the future.
+ * The out bit represents whether a cycle has been completed.
+ */
+
+CHIP QC32Bit {
+    IN count;
+    OUT out;
+
+    PARTS:
+	//The register that holds the QC's actual value
+	Register32(in=ResOut,load=true,out[7]=out,out[7]=reset,out=RegOut);
+	
+	//Calculate the QC's previous value + 1
+	Inc32(in=RegOut,out=RegInc);
+
+	Bit(in=count, load=true, out=started);
+	
+	And32(a[0]=started, a[1]=started, a[2]=started, a[3]=started,
+	a[4]=started, a[5]=started, a[6]=started, a[7]=started,
+	a[8]=started, a[9]=started, a[10]=started, a[11]=started,
+	a[12]=started, a[13]=started, a[14]=started, a[15]=started,
+	a[16]=started, a[17]=started, a[18]=started, a[19]=started,
+	a[20]=started, a[21]=started, a[22]=started, a[23]=started,
+	a[24]=started, a[25]=started, a[26]=started, a[27]=started,
+	a[28]=started, a[29]=started, a[30]=started, a[31]=started,
+	b=RegInc, out=andOut);
+	
+	//Determine whether to reset
+	Mux32(a=andOut,b=false,sel=reset,out=ResOut);
+	
+}

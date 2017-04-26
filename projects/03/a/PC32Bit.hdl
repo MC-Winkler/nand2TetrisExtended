@@ -1,0 +1,34 @@
+// This file is part of www.nand2tetris.org
+// and the book "The Elements of Computing Systems"
+// by Nisan and Schocken, MIT Press.
+// File name: projects/03/a/PC.hdl
+
+/**
+ * A 32-bit counter with load and reset control bits.
+ * if      (reset[t] == 1) out[t+1] = 0
+ * else if (load[t] == 1)  out[t+1] = in[t]
+ * else if (inc[t] == 1)   out[t+1] = out[t] + 1  (integer addition)
+ * else                    out[t+1] = out[t]
+ */
+
+CHIP PC32Bit {
+    IN in[32],load,inc,reset;
+    OUT out[32];
+
+    PARTS:
+	//The register that holds the PC's actual value
+	Register32Bit(in=ResOut,load=true,out=out,out=RegOut);
+	
+	//Calculate the PC's previous value + 1
+	Inc32(in=RegOut,out=RegInc);
+	
+	//Determine whether to increment
+	Mux32(a=RegOut,b=RegInc,sel=inc,out=IncOut);
+	
+	//Determine whether to load
+	Mux32(a=IncOut,b=in,sel=load,out=LoadOut);
+
+	//Determine whether to reset
+	Mux32(a=LoadOut,b=false,sel=reset,out=ResOut);
+	
+}

@@ -17,11 +17,13 @@ public class VMtranslator {
 	public static final int C_RETURN = 7;
 	public static final int C_CALL = 8;
 	
+	private static int currentProgramIndex = 0;
+	private static int numPrograms = 0;
 	private static CodeWriter theCodeWriter;
 
 	public static void main(String args[]) {
 
-		File fileOrDir = new File(args[0]);
+		File outerDirectory = new File(args[0]);
 		String outputFileName = args[0].split("\\.")[0] + ".asm";
 		BufferedWriter bufferedWriter;
 
@@ -32,7 +34,26 @@ public class VMtranslator {
 			e.printStackTrace();
 		}
 
-		if (fileOrDir.isFile()) {
+		System.out.println("processing outer directory");
+		
+		for (File programDirectory : outerDirectory.listFiles()){
+			numPrograms++;
+		}
+		
+		for (File programDirectory : outerDirectory.listFiles()){
+			currentProgramIndex++;
+			theCodeWriter.writeInit(numPrograms);
+			for (File file : programDirectory.listFiles()){
+				theCodeWriter.setFileName(file.getName() + currentProgramIndex);
+				if (file.isFile() && file.getName().split("\\.")[1].equals("vm")) {
+					processFile(file);
+				}
+			}
+		}
+		
+		theCodeWriter.finish();
+		
+		/*if (fileOrDir.isFile()) {
 			if (!(args[0].split("\\.")[1].equals("vm"))) {
 				throw new IllegalArgumentException("file type must be .vm");
 			} else {
@@ -55,8 +76,10 @@ public class VMtranslator {
 			theCodeWriter.finish();
 		} else {
 			throw new IllegalArgumentException("input not recognzied as file or folder");
-		}
+		}*/
 	}
+	
+	
 
 	private static void processFile(File file) {
 		
@@ -75,7 +98,7 @@ public class VMtranslator {
 			} else if (parser.commandType() == C_IF ){
 				theCodeWriter.writeIf(parser.arg1());
 			} else if (parser.commandType() == C_FUNCTION){
-				theCodeWriter.writeFunction(parser.arg1(), parser.arg2());
+				theCodeWriter.writeFunction(parser.arg1() + currentProgramIndex, parser.arg2());
 			} else if (parser.commandType() == C_RETURN){
 				theCodeWriter.writeReturn();
 			} else {

@@ -1,0 +1,34 @@
+// This file is part of www.nand2tetris.org
+// and the book "The Elements of Computing Systems"
+// by Nisan and Schocken, MIT Press.
+// File name: projects/03/a/RAM8_32.hdl
+
+/**
+ * Memory of 8 registers, each 16 bit-wide. Out holds the value
+ * stored at the memory location specified by address. If load==1, then 
+ * the in value is loaded into the memory location specified by address 
+ * (the loaded value will be emitted to out from the next time step onward).
+ */
+
+CHIP RAM832Bit {
+    IN in[32], load, address[3];
+    OUT out[32];
+
+    PARTS:
+	//The load bit (whether it be a 1 or a 0) is directed to the load input of
+	//whichever register address specifies.
+	DMux8Way(in=load,sel=address,a=R0L,b=R1L,c=R2L,d=R3L,e=R4L,f=R5L,g=R6L,h=R7L);
+	
+	//Eight 32-bit registers
+    Register32Bit(in=in,load=R0L,out=R0);
+    Register32Bit(in=in,load=R1L,out=R1);
+    Register32Bit(in=in,load=R2L,out=R2);
+    Register32Bit(in=in,load=R3L,out=R3);
+    Register32Bit(in=in,load=R4L,out=R4);
+    Register32Bit(in=in,load=R5L,out=R5);
+    Register32Bit(in=in,load=R6L,out=R6);
+    Register32Bit(in=in,load=R7L,out=R7);
+	
+	//Ensure that the register to which address points outputs its value
+	Mux8Way32(a=R0,b=R1,c=R2,d=R3,e=R4,f=R5,g=R6,h=R7,sel=address,out=out);
+}
